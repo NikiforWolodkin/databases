@@ -1,6 +1,3 @@
-DROP TABLE vnd_t;
-DROP TABLE vnd_t_child;
-
 CREATE TABLE VND_t (
     ID NUMBER(3) PRIMARY KEY,
     name VARCHAR2(50)
@@ -34,3 +31,6 @@ INSERT INTO vnd_t_child VALUES (11, '+375441899001');
 SELECT vnd_t.ID, VND_t_child.phone_number
 FROM vnd_t INNER JOIN vnd_t_child
 ON ID = person_ID;
+
+DROP TABLE vnd_t_child;
+DROP TABLE vnd_t;
