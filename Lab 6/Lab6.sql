@@ -6,6 +6,7 @@ SELECT NAME, VALUE FROM V$PARAMETER WHERE NAME = 'open_cursors';
 CREATE PFILE = 'VND_PFILE.ora' FROM SPFILE;
 
 --docker exec -t -i oracledb /bin/bash
+--/opt/oracle/dbs
 
 --docker exec -it oracledb sqlplus / as sysdba
 
