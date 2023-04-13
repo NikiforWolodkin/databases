@@ -1,14 +1,16 @@
 --env | grep ORACLE_HOME
 --/opt/oracle/dbs
 
-SELECT NAME, VALUE FROM V$PARAMETER WHERE NAME = 'open_cursors';
+ALTER SESSION SET CONTAINER=CDB$ROOT;
 
-CREATE PFILE = 'VND_PFILE.ora' FROM SPFILE;
+SELECT NAME, VALUE FROM V$PARAMETER WHERE NAME = 'open_cursors';
 
 --docker exec -t -i oracledb /bin/bash
 --/opt/oracle/dbs
 
 --docker exec -it oracledb sqlplus / as sysdba
+
+--create pfile='/tmp/initOrcl.ora' from spfile;
 
 --CREATE SPFILE FROM PFILE = 'VND_PFILE.ora';
 
