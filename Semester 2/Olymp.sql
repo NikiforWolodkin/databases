@@ -1,0 +1,140 @@
+--2
+SELECT
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '0') != 0) 
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key0,
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '1') != 0) 
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key1,
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '2') != 0) 
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key2,
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '3') != 0) 
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key3,
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '4') != 0)  
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key4,
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '5') != 0) 
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key5,
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '6') != 0) 
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key6,
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '7') != 0) 
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key7,
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '8') != 0) 
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key8,
+    CASE 
+        (SELECT COUNT(SAL)
+        FROM EMP
+        WHERE INSTR(TO_CHAR(SAL), '9') != 0)  
+    WHEN 0 THEN 'Broken'
+    ELSE 'Working'
+    END AS key9
+    FROM DUAL;
+
+--3
+SELECT DISTINCT EMPNO FROM EMP_PAYMENT EMP1
+    WHERE (
+        SELECT COUNT(*) FROM (SELECT COUNT(*) FROM EMP_PAYMENT EMP2
+            WHERE emp2.EMPNO = emp1.EMPNO
+            GROUP BY emp2.EMPNO, EXTRACT(MONTH FROM emp2.PAYMENT_DATE)
+            HAVING COUNT(*) >= 2)
+        ) = 2;
+        
+--5
+SELECT EMP1.EMPNO, EMP1.AMOUNT, EMP2.EMPNO, EMP2.AMOUNT, ABS(EMP1.AMOUNT - EMP2.AMOUNT) AS DIFF
+    FROM EMP_PAYMENT EMP1 CROSS JOIN EMP_PAYMENT EMP2
+    WHERE EMP1.EMPNO != EMP2.EMPNO
+    AND ABS(EMP1.AMOUNT - EMP2.AMOUNT) = (
+        SELECT MIN(ABS(EMP1.AMOUNT - EMP2.AMOUNT)) 
+        FROM EMP_PAYMENT EMP1 CROSS JOIN EMP_PAYMENT EMP2
+        WHERE EMP1.EMPNO != EMP2.EMPNO);
+        
+--6
+SELECT DEPTNO, (
+        (SELECT COUNT(*) FROM EMP EMP2 WHERE EMP1.DEPTNO = EMP2.DEPTNO AND SAL > 1500) /
+        (SELECT COUNT(*) FROM EMP EMP2 WHERE EMP1.DEPTNO = EMP2.DEPTNO)
+        * 100
+    ) AS PERC
+    FROM (SELECT * FROM EMP WHERE SAL > 1500) EMP1
+    GROUP BY DEPTNO
+    HAVING COUNT(*) > 3;
+    
+--7
+SELECT DISTINCT EMPNO, (
+        SELECT MAX(EMP3.AMOUNT) FROM (
+            SELECT AMOUNT FROM EMP_PAYMENT EMP2
+            WHERE EMP2.EMPNO = EMP1.EMPNO 
+            FETCH FIRST 3 ROWS ONLY
+        ) EMP3
+    ) AS MAX
+    FROM EMP_PAYMENT EMP1;
+
+--8
+SELECT DISTINCT EMPNO, (
+        SELECT MAX(EMP3.AMOUNT) FROM (
+            SELECT AMOUNT FROM EMP_PAYMENT EMP2
+            WHERE EMP2.EMPNO = EMP1.EMPNO 
+            ORDER BY EMP2.PAYMENT_DATE DESC
+            FETCH FIRST 3 ROWS ONLY
+        ) EMP3
+    ) AS MAX
+    FROM EMP_PAYMENT EMP1;
+    
+--10
+DESCRIBE EMP;
+DESCRIBE SICK_DAY;
+SELECT EMP.EMPNO, EMP.ENAME, EMP.SAL, EXTRACT(MONTH FROM SYSDATE) AS CURR_MON,
+    (DATE_TO - DATE_FROM) AS DAYS, ROUND(EMP.SAL - ((DATE_TO - DATE_FROM) * (EMP.SAL / CAST(TO_CHAR(LAST_DAY(SYSDATE), 'DD') AS INT)))) AS TO_PAY
+    FROM EMP INNER JOIN SICK_DAY
+    ON EMP.EMPNO = SICK_DAY.EMPNO
+    WHERE EXTRACT(MONTH FROM DATE_FROM) = EXTRACT(MONTH FROM SYSDATE);
+
+
+
+
+
+
+
+
+
