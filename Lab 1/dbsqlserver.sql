@@ -23,6 +23,7 @@ CREATE TABLE roles (
 
 CREATE TABLE staff (
     id INT PRIMARY KEY,
+    salary DECIMAL(10, 2) NOT NULL,
     name VARCHAR(50) NOT NULL
 );
 
@@ -38,7 +39,7 @@ CREATE TABLE staff_contacts (
 CREATE TABLE staff_roles (
     id INT PRIMARY KEY,
     employee_id INT NOT NULL,
-    role INT NOT NULL,
+    role int NOT NULL,
     FOREIGN KEY (employee_id) REFERENCES staff(id),
     FOREIGN KEY (role) REFERENCES roles(id)
 );
@@ -62,13 +63,15 @@ CREATE TABLE projects (
     status VARCHAR(200) NOT NULL --denormalized from events
 );
 
-CREATE TABLE project_events (
+CREATE TABLE project_stages (
     id INT PRIMARY KEY,
     project_id INT NOT NULL,
     event_type INT NOT NULL,
+    previous_stage INT NULL,
     description VARCHAR(200) NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects(id),
-    FOREIGN KEY (event_type) REFERENCES project_event_types(id)
+    FOREIGN KEY (event_type) REFERENCES project_event_types(id),
+    FOREIGN KEY (previous_stage) REFERENCES project_stages(id)
 );
 
 CREATE TABLE project_resources (
@@ -104,12 +107,29 @@ CREATE TABLE project_clients (
     FOREIGN KEY (client_id) REFERENCES clients(id)
 );
 
-CREATE TABLE project_developers (
+CREATE TABLE project_employees (
     id INT PRIMARY KEY,
     project_id INT NOT NULL,
     employee_id INT NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects(id),
     FOREIGN KEY (employee_id) REFERENCES staff(id)
+);
+
+CREATE TABLE project_roles (
+    id INT PRIMARY KEY,
+    project_employee_id INT NOT NULL,
+    staff_role_id INT NOT NULL,
+    FOREIGN KEY (project_employee_id) REFERENCES project_employees(id),
+    FOREIGN KEY (staff_role_id) REFERENCES staff_roles(id)
+);
+
+CREATE TABLE project_stages (
+    id INT PRIMARY KEY,
+    project_role_id INT NOT NULL,
+    stage_id INT NOT NULL,
+    rate DECIMAL(3, 2) NOT NULL,
+    FOREIGN KEY (project_role_id) REFERENCES project_roles(id),
+    FOREIGN KEY (stage_id) REFERENCES project_stages(id)
 );
 
 
@@ -119,9 +139,9 @@ CREATE TABLE project_payments (
     project_id INT NOT NULL,
     payment_date DATE NOT NULL,
     payment_amount DECIMAL(10, 2) NOT NULL,
-    associated_event INT NULL,
+    associated_stage INT NULL,
     FOREIGN KEY (project_id) REFERENCES projects(id),
-    FOREIGN KEY (associated_event) REFERENCES project_events(id)
+    FOREIGN KEY (associated_stage) REFERENCES project_stages(id)
 );
 
 CREATE TABLE staff_payments (
