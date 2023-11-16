@@ -26,7 +26,7 @@ FROM (
         -- INNER JOIN
         --     project_event_types
         --     ON project_stages.event_type = project_event_types.id
-        -- WHERE project_event_types.id = 1
+        -- WHERE project_event_types.id = 10
         GROUP BY 
             payment_date
     ) project_month
@@ -39,19 +39,19 @@ ORDER BY year, half_year, quarter, month;
 SELECT 
     service_count AS volume,
     (service_count / total_count) * 100 AS percent_of_total,
-    (service_count / max_count) * 100 AS percent_of_total
+    (service_count / max_count) * 100 AS percent_of_max
 FROM 
     (
         SELECT COUNT(*) as service_count 
         FROM project_payments
-        -- INNER JOIN
-        --     project_stages
-        --     ON project_payments.associated_stage = project_stages.id
-        -- INNER JOIN
-        --     project_event_types
-        --     ON project_stages.event_type = project_event_types.id
-        -- WHERE project_event_types.id = 1
-        WHERE payment_date BETWEEN date '2020-01-01' AND date '2024-01-01'
+        INNER JOIN
+            project_stages
+            ON project_payments.associated_stage = project_stages.id
+        INNER JOIN
+            project_event_types
+            ON project_stages.event_type = project_event_types.id
+        WHERE project_event_types.id = 12
+        AND payment_date BETWEEN date '2020-01-01' AND date '2024-01-01'
     ),
     (
         SELECT COUNT(*) as total_count 
@@ -63,14 +63,14 @@ FROM
         (
             SELECT COUNT(*) as service_count 
             FROM project_payments
-            -- INNER JOIN
-            --     project_stages
-            --     ON project_payments.associated_stage = project_stages.id
-            -- INNER JOIN
-            --     project_event_types
-            --     ON project_stages.event_type = project_event_types.id
+            INNER JOIN
+                project_stages
+                ON project_payments.associated_stage = project_stages.id
+            INNER JOIN
+                project_event_types
+                ON project_stages.event_type = project_event_types.id
             WHERE payment_date BETWEEN date '2020-01-01' AND date '2024-01-01'
-            -- GROUP BY project_event_types.id
+            GROUP BY project_event_types.id
         )
     );
 
