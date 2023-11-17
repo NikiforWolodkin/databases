@@ -99,7 +99,6 @@ WHERE row_num = 1;
 
 
 
-
 SELECT 
     client_id,
     FORMAT(payment_date, 'yyyy-MM') AS month,
@@ -118,3 +117,16 @@ ORDER BY
     client_id,
     month;
 
+
+
+SELECT 
+    pc.client_id,
+    MAX(DATEDIFF(DAY, ps.start_date, ps.end_date)) AS longest_stage_duration
+FROM 
+    project_clients pc
+JOIN 
+    projects p ON pc.project_id = p.id
+JOIN 
+    project_stages ps ON p.id = ps.project_id
+GROUP BY 
+    pc.client_id;

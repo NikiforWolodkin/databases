@@ -91,13 +91,13 @@ WHERE row_num BETWEEN 1 AND 20;
 SELECT *
 FROM (
     SELECT 
-        ROW_NUMBER() OVER (PARTITION BY project_id ORDER BY payment_date) AS row_num,
+        ROW_NUMBER() OVER (PARTITION BY id ORDER BY payment_date) AS row_num,
         project_payments.*
     FROM 
         project_payments
     WHERE 
         payment_date BETWEEN date '2020-01-01' AND date '2024-01-01'
-) 
+)
 WHERE row_num = 1;
 
 
@@ -119,3 +119,16 @@ GROUP BY
 ORDER BY 
     client_id,
     month;
+
+-- самая долгая стадия для каждого клиента
+SELECT 
+    pc.client_id,
+    MAX(ps.end_date - ps.start_date) AS longest_stage_duration
+FROM 
+    project_clients pc
+JOIN 
+    projects p ON pc.project_id = p.id
+JOIN 
+    project_stages ps ON p.id = ps.project_id
+GROUP BY 
+    pc.client_id;
